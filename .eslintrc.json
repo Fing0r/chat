@@ -1,0 +1,24 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    // "google"
+    "airbnb-base"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {
+    "semi": ["error", "always"],
+    "quotes": ["error", "double"],
+    "linebreak-style": ["error", "windows"],
+    "require-jsdoc": "off",
+    "no-plusplus": "off", 
+    "max-len": ["error", 120]
+    // "no-tabs": "off",
+    // "indent": [2, "tab"]
+  }
+}
