@@ -297,4 +297,12 @@ button {
   padding: 7px 8px;
 }
 
+.message-error {
+  display: none;
+}
+
+.modal__form.error .message-error {
+  display: block;
+}
+
 /*# sourceMappingURL=index.aa8fb0a4.css.map */

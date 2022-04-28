@@ -331,3 +331,11 @@ button {
   padding: 7px 8px;
   border: 1px solid #000000;
 }
+
+.message-error {
+  display: none;
+}
+
+.modal__form.error .message-error {
+  display: block;
+}

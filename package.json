@@ -5,7 +5,8 @@
   "scripts": {
     "lint": "eslint ./js",
     "lint:fix": "eslint ./js --fix",
-    "parcel": "npx parcel index.html"
+    "parcel": "npx parcel index.html",
+    "build": "npx parcel build index.html--public - url. /"
   },
   "author": "fin",
   "license": "ISC",
@@ -20,6 +21,7 @@
     "prettier": "^2.6.2"
   },
   "dependencies": {
-    "date-fns": "^2.28.0"
+    "date-fns": "^2.28.0",
+    "js-cookie": "^3.0.1"
   }
 }

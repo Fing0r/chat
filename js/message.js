@@ -1,9 +1,5 @@
 import { format, getTime } from "date-fns";
-
-const AUTHOR = {
-  USER: "Я: ",
-  COMPANION: "Собеседник мой: ",
-};
+import { AUTHOR } from "./config";
 
 export default class Message {
   constructor(text, author, status, time) {

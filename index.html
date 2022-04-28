@@ -17,7 +17,8 @@
       <div class="chat__wrapper">
         <div class="chat__btns">
           <button class="chat__btn chat__btn--settings" data-modal="settings" type="button">Настройки</button>
-          <button class="chat__btn chat__btn--exit" data-modal="authorization" type="button">Выйти</button>
+          <button class="chat__btn chat__btn" data-modal="authorization" type="button">Войти</button>
+          <button class="chat__btn chat__btn--exit" type="button" style="display: none;">Выйти</button>
         </div>
         <div class="chat__dialog">
           <ul class="chat__list">
@@ -79,15 +80,16 @@
           <div class="modal__content">
             <button type="button" class="modal__close">+</button>
             <h3 class="modal__title modal__title--settings">Настройки</h3>
-            <form class="modal__form" action="">
+            <form class="modal__form modal__form--settings" action="">
               <div class="modal__line">
                 <label class="modal__label" for="name">
                   Имя в чате
                 </label>
                 <div class="modal__holder">
                   <input class="modal__input" type="text" name="name">
-                  <button class="modal__send">-></button>
+                  <button class="modal__send" type="submit">-></button>
                 </div>
+                <span class="message-error">Ошибка</span>
               </div>
             </form>
           </div>
@@ -99,17 +101,18 @@
           <div class="modal__content">
             <button type="button" class="modal__close">+</button>
             <h3 class="modal__title">Подтверждение</h3>
-            <form class="modal__form" action="">
+            <form class="modal__form modal__form--login" action="">
               <div class="modal__line">
                 <label class="modal__label" for="email">
                   Код:
                 </label>
                 <div class="modal__holder">
-                  <input class="modal__input" type="number" name="email">
+                  <input class="modal__input" type="text" name="code">
                 </div>
                 <button class="modal__btn" type="submit">
                   Войти
                 </button>
+                <span class="message-error">Ошибка</span>
               </div>
             </form>
           </div>
@@ -129,9 +132,10 @@
                 <div class="modal__holder">
                   <input class="modal__input" type="email" name="email" required>
                 </div>
-                <button class="modal__btn modal__btn--code"  type="submit">
+                <button class="modal__btn modal__btn--code" type="submit">
                   Получить код
                 </button>
+                <span class="message-error">Ошибка</span>
               </div>
             </form>
           </div>
@@ -143,8 +147,7 @@
   <template id="messageTemplate">
     <div class="message__box">
       <div class="message__info">
-        <span class="message__name"></span>
-        <span class="message__text"></span>
+        <span class="message__name"></span>:&nbsp;<span class="message__text"></span>
       </div>
       <div class="message__time"></div>
     </div>
