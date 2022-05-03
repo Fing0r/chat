@@ -2,7 +2,7 @@ function ModalActions(e) {
   this.dataModal = e.target.dataset.modal;
   this.modal = document.querySelector(`#${this.dataModal}`);
   this.closeBtn = this.modal.querySelector(".modal__close");
-  this.form = this.modal.querySelector(".modal__form");
+  this.form = this.modal.querySelector(".form");
 
   this.closeModal = () => {
     this.modal.classList.remove("open");

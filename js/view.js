@@ -1,151 +1,132 @@
 import Cookies from "js-cookie";
 import { UI_ELEMENTS } from "./uiElements";
-import Message from "./message";
+import {
+  requestForCode, requestForChangeName, importMessage, requestForAccountData,
+} from "./request";
+import { AUTHOR, MESSAGES } from "./config";
 import newModal from "./modal";
-import { URL, AUTHOR } from "./config";
-
-const MESSAGES = [];
-
-function scrollToBottom() {
-  const element = UI_ELEMENTS.MESSAGES.firstElementChild;
-  const options = { block: "end", behavior: "smooth" };
-
-  element.scrollIntoView(options);
-}
+import {
+  showMessage, hideMessage, setCookiesToken, clearForm, getValue, getToken,
+} from "./helper";
+import { renderMessages } from "./render";
+import loader from "./loader";
+import SOCKET from "./webSocket";
 
 export function sendMessage(e) {
   e.preventDefault();
   const { value } = UI_ELEMENTS.INPUT;
   if (!value) return;
-  const newMessage = new Message(value);
-  const newMessageItem = newMessage.createItem();
-  MESSAGES.push(newMessage);
-  UI_ELEMENTS.MESSAGES.prepend(newMessageItem);
+  SOCKET.sendMessage(value);
   UI_ELEMENTS.INPUT.value = "";
-  scrollToBottom();
-}
-
-async function requestForCode(email) {
-  const data = { email };
-  const headers = {
-    "Content-Type": "application/json;charset=utf-8",
-  };
-
-  const options = {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers,
-  };
-
-  return fetch(URL.AUTORIZATION, options);
 }
 
 export async function getCode(e) {
   e.preventDefault();
 
   try {
-    const { value } = e.target.querySelector(".modal__input");
-    if (!value) return;
+    const value = getValue(e);
+
     const modal = e.target.closest(".modal");
     const response = await requestForCode(value);
     if (!response.ok) throw new Error("Ошибка запроса");
     newModal(e);
     hideMessage(e);
+    clearForm(e);
     modal.classList.remove("open");
+    UI_ELEMENTS.AUTHORIZATION.dataset.modal = "confirmation";
   } catch (error) {
     showMessage(e, error.message);
   }
 }
 
-function showMessage(e, text) {
-  const form = e.target;
-  const formError = form.querySelector(".message-error");
-  form.classList.add("error");
-  formError.textContent = text;
-}
-
-function hideMessage(e) {
-  const form = e.target;
-  const formError = form.querySelector(".message-error");
-  if (!formError) return;
-  form.classList.remove("error");
+function changeNameOldMessages() {
+  [...MESSAGES.USER].forEach((element) => {
+    const messageName = element.querySelector(".message__name");
+    messageName.textContent = AUTHOR.NAME;
+  });
 }
 
 export async function changeName(e) {
-  e.preventDefault();
-  hideMessage(e);
-  const token = Cookies.get("token");
-  if (!token) return showMessage(e, "Вы не авторизованны");
-  hideMessage(e);
-
-  const input = e.target.querySelector(".modal__input");
-  const name = input.value;
-  const data = { name: `${name}` };
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json;charset=utf-8",
-  };
-  const options = {
-    method: "PATCH",
-    body: JSON.stringify(data),
-    headers,
-  };
-
   try {
-    await fetch(URL.AUTORIZATION, options);
+    e.preventDefault();
+    const { value: name } = e.target.querySelector(".form__input");
     showMessage(e, "Вы сменили ник");
+    AUTHOR.NAME = name.trim();
+    changeNameOldMessages();
+
+    // hideMessage(e);
+    const token = getToken();
+    await requestForChangeName(name, token);
   } catch (error) {
-    showMessage(e, "Ошибка");
+    showMessage(e, error.message);
   }
 }
 
-async function getAccountData(token) {
-  const headers = {
-    Authorization: `Bearer ${token}`,
-  };
-  const options = { headers };
-  const response = await fetch(URL.CHANGE_NAME, options);
-
-  if (!response.ok) throw new Error("Ошибка запроса");
-
-  const result = await response.json();
-  stateUIElements(result);
-}
-
-function stateUIElements({ name }) {
-  AUTHOR.USER = name || "Я";
-  UI_ELEMENTS.NAME.value = AUTHOR.USER;
+function stateUIElements(email, name) {
+  AUTHOR.EMAIL = email;
+  AUTHOR.NAME = name || "Я";
+  UI_ELEMENTS.NAME.value = AUTHOR.NAME;
   UI_ELEMENTS.EXIT.style.display = name ? "block" : "none";
   UI_ELEMENTS.AUTHORIZATION.style.display = name ? "none" : "block";
+}
+
+async function getAccountData(token) {
+  const response = await requestForAccountData(token);
+  if (!response.ok) throw new Error("Ошибка запроса");
+  const { email, name } = await response.json();
+  stateUIElements(email, name);
 }
 
 export async function saveToken(e) {
   try {
     e.preventDefault();
-    const { value: token } = e.target.querySelector(".modal__input");
-    if (!token) return;
+    const token = getValue(e);
+
     await getAccountData(token);
-    const date = new Date(new Date().getTime() + 3600 * 1000);
-    Cookies.set("token", token, { expires: date });
+    setCookiesToken(token);
+    document.querySelector(".chat__btns").style.zIndex = "101";
+
     const modal = e.target.closest(".modal");
     modal.classList.remove("open");
+
+    loader(UI_ELEMENTS.DIALOG);
+    clearForm(e);
+    MESSAGES.STORAGE = await importMessage();
+    renderMessages(MESSAGES.STORAGE);
+
+    SOCKET.init(token);
   } catch (error) {
     showMessage(e, "Введите верный код");
+  } finally {
+    loader(UI_ELEMENTS.DIALOG);
+    document.querySelector(".chat__btns").style.zIndex = null;
   }
 }
 
 export async function loadPage() {
+  loader(UI_ELEMENTS.CHAT);
   try {
-    const token = Cookies.get("token");
-    if (!token) throw new Error("Вы не авторизованны");
+    const token = getToken();
     await getAccountData(token);
+    SOCKET.init(token);
+
+    MESSAGES.STORAGE = await importMessage();
+    renderMessages(MESSAGES.STORAGE);
   } catch (error) {
     console.log(error.message);
-    stateUIElements({});
+    stateUIElements();
+  } finally {
+    loader(UI_ELEMENTS.CHAT);
   }
 }
 
 export function signOut() {
   Cookies.remove("token");
-  stateUIElements({});
+  SOCKET.disconnect();
+  UI_ELEMENTS.MESSAGES.replaceChildren();
+  stateUIElements();
+  MESSAGES.START = 1;
+  MESSAGES.END = 20;
+  MESSAGES.STORAGE = [];
+  UI_ELEMENTS.AUTHORIZATION.dataset.modal = "authorization";
 }

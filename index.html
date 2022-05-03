@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Title</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="style.css?version=0" rel="stylesheet">
   <script defer src="./js/main.js?version=0" type="module"></script>
 </head>
@@ -14,82 +14,65 @@
 <body>
   <div class="chat-wrapper">
     <div class="chat">
+
+      <div class="loader" tabindex="1">
+        <div class="sk-chase">
+          <div class="sk-chase-dot"></div>
+          <div class="sk-chase-dot"></div>
+          <div class="sk-chase-dot"></div>
+          <div class="sk-chase-dot"></div>
+          <div class="sk-chase-dot"></div>
+          <div class="sk-chase-dot"></div>
+        </div>
+      </div>
       <div class="chat__wrapper">
         <div class="chat__btns">
-          <button class="chat__btn chat__btn--settings" data-modal="settings" type="button">Настройки</button>
-          <button class="chat__btn chat__btn" data-modal="authorization" type="button">Войти</button>
-          <button class="chat__btn chat__btn--exit" type="button" style="display: none;">Выйти</button>
+          <button class="chat__btn btn btn--big" data-modal="settings" type="button">Настройки</button>
+          <button class="chat__btn btn btn--big" data-modal="authorization" type="button">Войти</button>
+          <button class="chat__btn btn btn--big" data-action="logout" type="button" style="display: none;">Выйти</button>
         </div>
         <div class="chat__dialog">
+          <button class="chat__btn chat__btn--start btn btn--min" type="button" data-action="scrollToStart">
+            <svg class="arrow-bottom-2" viewBox="0 0 9 14">
+              <path class="svg-arrow" d="M6.660,8.922 L6.660,8.922 L2.350,13.408 L0.503,11.486 L4.813,7.000 L0.503,2.515 L2.350,0.592 L8.507,7.000 L6.660,8.922 Z" stroke="red" fill="red"/>
+            </svg>
+          </button>
+          <div class="loader" tabindex="1">
+            <div class="sk-chase">
+              <div class="sk-chase-dot"></div>
+              <div class="sk-chase-dot"></div>
+              <div class="sk-chase-dot"></div>
+              <div class="sk-chase-dot"></div>
+              <div class="sk-chase-dot"></div>
+              <div class="sk-chase-dot"></div>
+            </div>
+          </div>
           <ul class="chat__list">
-            <li class="message message--sent">
-              <div class="message__box">
-                <div class="message__text">
-                  <span class="message__name">Я: </span> Добрый день!
-                </div>
-                <div class="message__time">
-                  18:45
-                </div>
-              </div>
-            </li>
-            <li class="message message--received">
-              <div class="message__box">
-                <div class="message__text">
-                  <span class="message__name">Собеседник мой: </span>
-                  А это второе и, кажется,
-                  оно очень длинное, чтобы
-                  поместиться на одной строке
-                </div>
-                <div class="message__time">
-                  18:45
-                </div>
-              </div>
-            </li>
-            <li class="message message--received">
-              <div class="message__box">
-                <div class="message__text">
-                  <span class="message__name">Собеседник мой: </span> Добрый день!
-                </div>
-                <div class="message__time">
-                  18:45
-                </div>
-              </div>
-            </li>
-            <li class="message">
-              <div class="message__box">
-                <div class="message__text">
-                  <span class="message__name">Я: </span> Добрый день!
-                </div>
-                <div class="message__time">
-                  18:45
-                </div>
-              </div>
-            </li>
           </ul>
         </div>
-        <form class="chat__form">
-          <label class="chat__label" for="message">
-            <input class="chat__input" type="text" name="message" placeholder="сообщение..">
+        <form class="chat__form form" data-action="sendMessage">
+          <label class="form__label">
+            <input class="form__input input" type="text" name="message" placeholder="сообщение..">
           </label>
-          <button type="submit" class="chat__send" id="sendMessage">-></button>
+          <button type="submit" class="form__btn btn btn--min" id="sendMessage">-></button>
         </form>
       </div>
 
       <div class="chat__modal modal" id="settings">
         <div class="modal__body">
           <div class="modal__content">
-            <button type="button" class="modal__close">+</button>
+            <button type="button" class="modal__close btn btn--min"><span>+</span></button>
             <h3 class="modal__title modal__title--settings">Настройки</h3>
-            <form class="modal__form modal__form--settings" action="">
-              <div class="modal__line">
-                <label class="modal__label" for="name">
+            <form class="modal__form modal__form--settings form" action="" data-action="changeName">
+              <div class="form__line">
+                <label class="form__label" for="name">
                   Имя в чате
                 </label>
-                <div class="modal__holder">
-                  <input class="modal__input" type="text" name="name">
-                  <button class="modal__send" type="submit">-></button>
+                <div class="form__holder">
+                  <input class="form__input input" type="text" name="name">
+                  <button class="form__btn  btn btn--min" type="submit">-></button>
                 </div>
-                <span class="message-error">Ошибка</span>
+                <span class="alert">Ошибка</span>
               </div>
             </form>
           </div>
@@ -99,20 +82,20 @@
       <div class="chat__modal modal" id="confirmation">
         <div class="modal__body">
           <div class="modal__content">
-            <button type="button" class="modal__close">+</button>
+            <button type="button" class="modal__close btn btn--min"><span>+</span></button>
             <h3 class="modal__title">Подтверждение</h3>
-            <form class="modal__form modal__form--login" action="">
-              <div class="modal__line">
-                <label class="modal__label" for="email">
+            <form class="modal__form form" action="" data-action="login">
+              <div class="form__line">
+                <label class="form__label" for="email">
                   Код:
                 </label>
-                <div class="modal__holder">
-                  <input class="modal__input" type="text" name="code">
+                <div class="form__holder">
+                  <input class="form__input input" type="text" name="code">
                 </div>
-                <button class="modal__btn" type="submit">
+                <button class="form__btn btn btn--big" type="submit">
                   Войти
                 </button>
-                <span class="message-error">Ошибка</span>
+                <span class="alert">Ошибка</span>
               </div>
             </form>
           </div>
@@ -122,20 +105,20 @@
       <div class="chat__modal modal" id="authorization">
         <div class="modal__body">
           <div class="modal__content">
-            <button type="button" class="modal__close">+</button>
+            <button type="button" class="modal__close btn btn--min"><span>+</span></button>
             <h3 class="modal__title">Авторизация</h3>
-            <form class="modal__form modal__form--code" action="" data-modal="confirmation">
+            <form class="modal__form modal__form--code form" action="" data-modal="confirmation" data-action="code">
               <div class="modal__line">
-                <label class="modal__label" for="email">
+                <label class="form__label" for="email">
                   Почта:
                 </label>
-                <div class="modal__holder">
-                  <input class="modal__input" type="email" name="email" required>
+                <div class="form__holder">
+                  <input class="form__input input" type="email" name="email" required>
                 </div>
-                <button class="modal__btn modal__btn--code" type="submit">
+                <button class="form__btn btn btn--big" type="submit">
                   Получить код
                 </button>
-                <span class="message-error">Ошибка</span>
+                <span class="alert">Ошибка</span>
               </div>
             </form>
           </div>
@@ -144,6 +127,7 @@
 
     </div>
   </div>
+
   <template id="messageTemplate">
     <div class="message__box">
       <div class="message__info">

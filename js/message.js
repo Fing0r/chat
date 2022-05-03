@@ -2,20 +2,14 @@ import { format, getTime } from "date-fns";
 import { AUTHOR } from "./config";
 
 export default class Message {
-  constructor(text, author, status, time) {
+  constructor({
+    text, user: { email, name }, createdAt: time, status,
+  }) {
+    this.email = email;
     this.text = text;
-    this.author = author || AUTHOR.USER;
-    this.status = status || "unread";
+    this.name = name;
     this.time = time || getTime(new Date());
-  }
-
-  createObj() {
-    return {
-      text: this.text,
-      author: this.author,
-      status: this.status,
-      time: this.time,
-    };
+    this.status = status || "unread";
   }
 
   createItem() {
@@ -27,21 +21,19 @@ export default class Message {
     this.itemText = this.item.querySelector(".message__text");
     this.itemTime = this.item.querySelector(".message__time");
 
-    const isAuthorNotUser = this.author !== AUTHOR.USER;
-    if (isAuthorNotUser) this.item.classList.add("message--received");
+    const isAuthorUser = this.email === AUTHOR.EMAIL;
+    if (isAuthorUser) this.item.classList.add("message--user");
+
     if (this.status) this.item.classList.add("message--sent");
 
-    this.itemAuthor.textContent = this.author;
+    this.itemAuthor.textContent = isAuthorUser ? AUTHOR.NAME : this.name;
     this.itemText.textContent = this.text;
     this.itemTime.textContent = format(new Date(this.time), "HH:mm");
 
     return this.item;
   }
 
-  scrollToBottom() {
-    this.item.scrollIntoView({
-      block: "end",
-      behavior: "smooth",
-    });
-  }
+  appendItem = (element) => element.append(this.createItem());
+
+  prependItem = (element) => element.prepend(this.createItem());
 }

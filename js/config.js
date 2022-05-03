@@ -1,8 +1,17 @@
 export const URL = {
   AUTORIZATION: "https://mighty-cove-31255.herokuapp.com/api/user",
   CHANGE_NAME: "https://mighty-cove-31255.herokuapp.com/api/user/me",
+  MESSAGE: "https://mighty-cove-31255.herokuapp.com/api/messages",
+  SOCKET: "ws://mighty-cove-31255.herokuapp.com/websockets?",
 };
 export const AUTHOR = {
-  USER: "Я",
+  NAME: "Я",
   COMPANION: "Собеседник мой",
+  EMAIL: "",
+};
+export const MESSAGES = {
+  START: 1,
+  END: 20,
+  STORAGE: [],
+  USER: document.getElementsByClassName("message--user"),
 };
