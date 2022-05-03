@@ -31,7 +31,7 @@
           <button class="chat__btn btn btn--big" data-modal="authorization" type="button">Войти</button>
           <button class="chat__btn btn btn--big" data-action="logout" type="button" style="display: none;">Выйти</button>
         </div>
-        <div class="chat__dialog">
+        <div class="chat__box">
           <button class="chat__btn chat__btn--start btn btn--min" type="button" data-action="scrollToStart">
             <svg class="arrow-bottom-2" viewBox="0 0 9 14">
               <path class="svg-arrow" d="M6.660,8.922 L6.660,8.922 L2.350,13.408 L0.503,11.486 L4.813,7.000 L0.503,2.515 L2.350,0.592 L8.507,7.000 L6.660,8.922 Z" stroke="red" fill="red"/>
@@ -69,7 +69,7 @@
                   Имя в чате
                 </label>
                 <div class="form__holder">
-                  <input class="form__input input" type="text" name="name">
+                  <input class="form__input input" type="text" name="name" data-input="true">
                   <button class="form__btn  btn btn--min" type="submit">-></button>
                 </div>
                 <span class="alert">Ошибка</span>
@@ -90,7 +90,7 @@
                   Код:
                 </label>
                 <div class="form__holder">
-                  <input class="form__input input" type="text" name="code">
+                  <input class="form__input input" type="text" name="code" data-input="true">
                 </div>
                 <button class="form__btn btn btn--big" type="submit">
                   Войти
@@ -113,7 +113,7 @@
                   Почта:
                 </label>
                 <div class="form__holder">
-                  <input class="form__input input" type="email" name="email" required>
+                  <input class="form__input input" type="email" name="email" required data-input="true">
                 </div>
                 <button class="form__btn btn btn--big" type="submit">
                   Получить код

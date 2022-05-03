@@ -536,42 +536,48 @@ var _render = require("./render");
 const renderMessageOnScrollThrottle = _helper.throttle(_render.renderMessageOnScroll, 300);
 const showArrowOnScrollThrottle = _helper.throttle(_helper.showArrowOnScroll, 200);
 document.addEventListener("DOMContentLoaded", _view.loadPage);
-_uiElements.UI_ELEMENTS.SETTINGS.addEventListener("click", _modalDefault.default);
-_uiElements.UI_ELEMENTS.AUTHORIZATION.addEventListener("click", _modalDefault.default);
+_uiElements.BUTTONS.SETTINGS.addEventListener("click", _modalDefault.default);
+_uiElements.BUTTONS.AUTHORIZATION.addEventListener("click", _modalDefault.default);
+_uiElements.BUTTONS.EXIT.addEventListener("click", _view.signOut);
 _uiElements.FORM.CODE.addEventListener("submit", _view.getCode);
 _uiElements.FORM.MESSAGE.addEventListener("submit", _view.sendMessage);
 _uiElements.FORM.LOGIN.addEventListener("submit", _view.saveToken);
 _uiElements.FORM.CHANGE_NAME.addEventListener("submit", _view.changeName);
-_uiElements.UI_ELEMENTS.EXIT.addEventListener("click", _view.signOut);
-_uiElements.UI_ELEMENTS.START.addEventListener("click", _helper.scrollToBottom);
-_uiElements.UI_ELEMENTS.MESSAGES.addEventListener("scroll", renderMessageOnScrollThrottle);
-_uiElements.UI_ELEMENTS.MESSAGES.addEventListener("scroll", showArrowOnScrollThrottle);
+_uiElements.CHAT.START.addEventListener("click", _helper.scrollToBottom);
+_uiElements.CHAT.LIST.addEventListener("scroll", renderMessageOnScrollThrottle);
+_uiElements.CHAT.LIST.addEventListener("scroll", showArrowOnScrollThrottle);
 
 },{"./uiElements":"bu0XR","./view":"2GA9o","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./modal":"guy4I","./helper":"6fitd","./render":"9k0mC"}],"bu0XR":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "UI_ELEMENTS", ()=>UI_ELEMENTS
+parcelHelpers.export(exports, "CHAT", ()=>CHAT
+);
+parcelHelpers.export(exports, "BUTTONS", ()=>BUTTONS
 );
 parcelHelpers.export(exports, "FORM", ()=>FORM
 );
 parcelHelpers.export(exports, "MODAL", ()=>MODAL
 );
-const UI_ELEMENTS = {
-    CHAT: document.querySelector(".chat"),
-    DIALOG: document.querySelector(".chat__box"),
+const CHAT = {
+    BODY: document.querySelector(".chat"),
+    BOX: document.querySelector(".chat__box"),
+    LIST: document.querySelector(".chat__list"),
+    EXIT: document.querySelector("[data-action='logout']"),
+    // LOGIN: document.querySelector("[data-action='login']"),
+    // CHANGE_NAME: document.querySelector(".modal__form--settings"),
+    // FORM: document.querySelector(".form"),
+    NAME: document.querySelector("[name='name']"),
+    INPUT: document.querySelector(".form__input"),
+    START: document.querySelector(".chat__btn--start")
+};
+const BUTTONS = {
     SETTINGS: document.querySelector("[data-modal='settings']"),
     CONFIRMATION: document.querySelector("[data-modal='confirmation']"),
     AUTHORIZATION: document.querySelector("[data-modal='authorization']"),
-    EXIT: document.querySelector("[data-action='logout']"),
-    LOGIN: document.querySelector("[data-action='login']"),
-    CHANGE_NAME: document.querySelector(".modal__form--settings"),
-    FORM: document.querySelector(".form"),
-    NAME: document.querySelector("[name='name']"),
-    INPUT: document.querySelector(".form__input"),
-    MESSAGES: document.querySelector(".chat__list"),
-    START: document.querySelector(".chat__btn--start")
+    EXIT: document.querySelector("[data-action='logout']")
 };
 const FORM = {
+    BODY: document.querySelector(".form"),
     CHANGE_NAME: document.querySelector("[data-action='changeName']"),
     LOGIN: document.querySelector("[data-action='login']"),
     CODE: document.querySelector("[data-action='code']"),
@@ -580,8 +586,7 @@ const FORM = {
 const MODAL = {
     SETTINGS: document.querySelector("#settings"),
     CONFIRMATION: document.querySelector("#confirmation"),
-    AUTHORIZATION: document.querySelector("#authorization"),
-    FORM_CODE: document.querySelector("[data-action='code']")
+    AUTHORIZATION: document.querySelector("#authorization")
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
@@ -644,10 +649,10 @@ var _webSocket = require("./webSocket");
 var _webSocketDefault = parcelHelpers.interopDefault(_webSocket);
 function sendMessage(e) {
     e.preventDefault();
-    const { value  } = _uiElements.UI_ELEMENTS.INPUT;
+    const { value  } = _uiElements.CHAT.INPUT;
     if (!value) return;
     _webSocketDefault.default.sendMessage(value);
-    _uiElements.UI_ELEMENTS.INPUT.value = "";
+    _uiElements.CHAT.INPUT.value = "";
 }
 async function getCode(e) {
     e.preventDefault();
@@ -660,7 +665,7 @@ async function getCode(e) {
         _helper.hideMessage(e);
         _helper.clearForm(e);
         modal.classList.remove("open");
-        _uiElements.UI_ELEMENTS.AUTHORIZATION.dataset.modal = "confirmation";
+        _uiElements.BUTTONS.AUTHORIZATION.dataset.modal = "confirmation";
     } catch (error) {
         _helper.showMessage(e, error.message);
     }
@@ -682,6 +687,7 @@ async function changeName(e) {
         changeNameOldMessages();
         // hideMessage(e);
         const token = _helper.getToken();
+        _webSocketDefault.default.init(token);
         await _request.requestForChangeName(name, token);
     } catch (error) {
         _helper.showMessage(e, error.message);
@@ -690,9 +696,9 @@ async function changeName(e) {
 function stateUIElements(email, name) {
     _config.AUTHOR.EMAIL = email;
     _config.AUTHOR.NAME = name || "Я";
-    _uiElements.UI_ELEMENTS.NAME.value = _config.AUTHOR.NAME;
-    _uiElements.UI_ELEMENTS.EXIT.style.display = name ? "block" : "none";
-    _uiElements.UI_ELEMENTS.AUTHORIZATION.style.display = name ? "none" : "block";
+    _uiElements.CHAT.NAME.value = _config.AUTHOR.NAME;
+    _uiElements.BUTTONS.EXIT.style.display = name ? "block" : "none";
+    _uiElements.BUTTONS.AUTHORIZATION.style.display = name ? "none" : "block";
 }
 async function getAccountData(token) {
     const response = await _request.requestForAccountData(token);
@@ -706,23 +712,25 @@ async function saveToken(e) {
         const token = _helper.getValue(e);
         await getAccountData(token);
         _helper.setCookiesToken(token);
-        document.querySelector(".chat__btns").style.zIndex = "101";
         const modal = e.target.closest(".modal");
         modal.classList.remove("open");
-        _loaderDefault.default(_uiElements.UI_ELEMENTS.DIALOG);
+        _webSocketDefault.default.init(token);
+        document.querySelector(".chat__btns").style.zIndex = "101";
+        _loaderDefault.default(_uiElements.CHAT.BOX);
         _helper.clearForm(e);
         _config.MESSAGES.STORAGE = await _request.importMessage();
         _render.renderMessages(_config.MESSAGES.STORAGE);
-        _webSocketDefault.default.init(token);
     } catch (error) {
         _helper.showMessage(e, "Введите верный код");
+        document.querySelector(".chat__btns").style.zIndex = "101";
+        _loaderDefault.default(_uiElements.CHAT.BOX);
     } finally{
-        _loaderDefault.default(_uiElements.UI_ELEMENTS.DIALOG);
         document.querySelector(".chat__btns").style.zIndex = null;
+        _loaderDefault.default(_uiElements.CHAT.BOX);
     }
 }
 async function loadPage() {
-    _loaderDefault.default(_uiElements.UI_ELEMENTS.CHAT);
+    _loaderDefault.default(_uiElements.CHAT.BODY);
     try {
         const token = _helper.getToken();
         await getAccountData(token);
@@ -733,28 +741,37 @@ async function loadPage() {
         console.log(error.message);
         stateUIElements();
     } finally{
-        _loaderDefault.default(_uiElements.UI_ELEMENTS.CHAT);
+        _loaderDefault.default(_uiElements.CHAT.BODY);
     }
 }
 function signOut() {
     _jsCookieDefault.default.remove("token");
     _webSocketDefault.default.disconnect();
-    _uiElements.UI_ELEMENTS.MESSAGES.replaceChildren();
+    _uiElements.CHAT.LIST.replaceChildren();
     stateUIElements();
     _config.MESSAGES.START = 1;
     _config.MESSAGES.END = 20;
     _config.MESSAGES.STORAGE = [];
-    _uiElements.UI_ELEMENTS.AUTHORIZATION.dataset.modal = "authorization";
+    _uiElements.BUTTONS.AUTHORIZATION.dataset.modal = "authorization";
 }
 
 },{"./uiElements":"bu0XR","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./modal":"guy4I","js-cookie":"c8bBu","./config":"4Wc5b","./helper":"6fitd","./request":"7c4ZJ","./render":"9k0mC","./loader":"cxlpn","./webSocket":"eIiZF"}],"guy4I":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-function ModalActions(e) {
-    this.dataModal = e.target.dataset.modal;
+function ModalActions(e1) {
+    this.dataModal = e1.target.dataset.modal;
     this.modal = document.querySelector(`#${this.dataModal}`);
     this.closeBtn = this.modal.querySelector(".modal__close");
     this.form = this.modal.querySelector(".form");
+    this.hideAlert = (e)=>{
+        this.input = e.target;
+        const isNotHasDataInput = this.input.dataset.input === undefined;
+        if (isNotHasDataInput) return;
+        const isNotHasNote = !this.form.classList.contains("note");
+        if (isNotHasNote) return;
+        this.form.classList.remove("note");
+    };
+    this.form.addEventListener("input", this.hideAlert);
     this.closeModal = ()=>{
         this.modal.classList.remove("open");
         this.removeListeners();
@@ -762,8 +779,8 @@ function ModalActions(e) {
     this.submitCloseModal = ()=>{
     // this.form.addEventListener("submit", this.closeModal);
     };
-    this.closeModalOutsideOfContent = (event)=>{
-        if (event.target !== this.modal) return;
+    this.closeModalOutsideOfContent = (e)=>{
+        if (e.target !== this.modal) return;
         this.closeModal();
     };
     this.removeListeners = ()=>{
@@ -880,10 +897,10 @@ parcelHelpers.export(exports, "AUTHOR", ()=>AUTHOR
 parcelHelpers.export(exports, "MESSAGES", ()=>MESSAGES
 );
 const URL = {
-    AUTORIZATION: "https://mighty-cove-31255.herokuapp.com/api/user",
+    AUTHORIZATION: "https://mighty-cove-31255.herokuapp.com/api/user",
     CHANGE_NAME: "https://mighty-cove-31255.herokuapp.com/api/user/me",
     MESSAGE: "https://mighty-cove-31255.herokuapp.com/api/messages",
-    SOCKET: "ws://mighty-cove-31255.herokuapp.com/websockets?"
+    SOCKET: "wss://mighty-cove-31255.herokuapp.com/websockets?"
 };
 const AUTHOR = {
     NAME: "Я",
@@ -937,7 +954,7 @@ function getToken() {
     return token;
 }
 function scrollToBottom() {
-    const element = _uiElements.UI_ELEMENTS.MESSAGES.firstElementChild;
+    const element = _uiElements.CHAT.LIST.firstElementChild;
     const options = {
         block: "end",
         behavior: "smooth"
@@ -945,9 +962,9 @@ function scrollToBottom() {
     element.scrollIntoView(options);
 }
 function showArrowOnScroll() {
-    const isNotStart = -_uiElements.UI_ELEMENTS.MESSAGES.scrollTop > _uiElements.UI_ELEMENTS.MESSAGES.offsetHeight;
-    _uiElements.UI_ELEMENTS.START.style.opacity = isNotStart ? "1" : null;
-    _uiElements.UI_ELEMENTS.START.style.visibility = isNotStart ? "visible" : null;
+    const isNotStart = -_uiElements.CHAT.LIST.scrollTop > _uiElements.CHAT.LIST.offsetHeight;
+    _uiElements.CHAT.START.style.opacity = isNotStart ? "1" : null;
+    _uiElements.CHAT.START.style.visibility = isNotStart ? "visible" : null;
 }
 function setCookiesToken(token) {
     const lifetime = new Date(new Date().getTime() + 36000000);
@@ -1024,7 +1041,7 @@ function requestForCode(email) {
         body: JSON.stringify(data),
         headers
     };
-    return fetch(_config.URL.AUTORIZATION, options);
+    return fetch(_config.URL.AUTHORIZATION, options);
 }
 function requestForChangeName(name, token) {
     const data = {
@@ -1039,7 +1056,7 @@ function requestForChangeName(name, token) {
         body: JSON.stringify(data),
         headers
     };
-    return fetch(_config.URL.AUTORIZATION, options);
+    return fetch(_config.URL.AUTHORIZATION, options);
 }
 async function importMessage() {
     const response = await fetch(_config.URL.MESSAGE);
@@ -1073,14 +1090,14 @@ function renderMessages(messages, startMessage = _config.MESSAGES.START, countMe
     if (!messages.length) return;
     for(let i = startMessage; i <= countMessage; i++){
         const newMessage = new _messageDefault.default(messages[messages.length - i]);
-        newMessage.appendItem(_uiElements.UI_ELEMENTS.MESSAGES);
+        newMessage.appendItem(_uiElements.CHAT.LIST);
     }
     _config.MESSAGES.START += 20;
     _config.MESSAGES.END += 20;
 }
 function renderMessageOnScroll() {
-    const positionScroll = _uiElements.UI_ELEMENTS.MESSAGES.scrollTop - _uiElements.UI_ELEMENTS.MESSAGES.offsetHeight;
-    const threshold = positionScroll + _uiElements.UI_ELEMENTS.MESSAGES.scrollHeight <= 50;
+    const positionScroll = _uiElements.CHAT.LIST.scrollTop - _uiElements.CHAT.LIST.offsetHeight;
+    const threshold = positionScroll + _uiElements.CHAT.LIST.scrollHeight <= 50;
     if (threshold) renderMessages(_config.MESSAGES.STORAGE);
 }
 
@@ -4186,7 +4203,7 @@ function ConnectSocket() {
     this.socket = null;
     this.renderMessage = (e)=>{
         const message = new _messageDefault.default(this.data(e));
-        message.prependItem(_uiElements.UI_ELEMENTS.MESSAGES);
+        message.prependItem(_uiElements.CHAT.LIST);
         _helper.scrollToBottom();
     };
     this.checkError = ()=>{

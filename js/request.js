@@ -12,7 +12,7 @@ export function requestForCode(email) {
     headers,
   };
 
-  return fetch(URL.AUTORIZATION, options);
+  return fetch(URL.AUTHORIZATION, options);
 }
 
 export function requestForChangeName(name, token) {
@@ -27,7 +27,7 @@ export function requestForChangeName(name, token) {
     headers,
   };
 
-  return fetch(URL.AUTORIZATION, options);
+  return fetch(URL.AUTHORIZATION, options);
 }
 
 export async function importMessage() {

@@ -1,5 +1,5 @@
 import Message from "./message";
-import { UI_ELEMENTS } from "./uiElements";
+import { CHAT } from "./uiElements";
 import { getToken, scrollToBottom } from "./helper";
 import { URL } from "./config";
 
@@ -11,7 +11,7 @@ function ConnectSocket() {
 
   this.renderMessage = (e) => {
     const message = new Message(this.data(e));
-    message.prependItem(UI_ELEMENTS.MESSAGES);
+    message.prependItem(CHAT.LIST);
     scrollToBottom();
   };
 

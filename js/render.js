@@ -1,4 +1,4 @@
-import { UI_ELEMENTS } from "./uiElements";
+import { CHAT } from "./uiElements";
 import { MESSAGES } from "./config";
 import Message from "./message";
 
@@ -7,7 +7,7 @@ export function renderMessages(messages, startMessage = MESSAGES.START, countMes
 
   for (let i = startMessage; i <= countMessage; i++) {
     const newMessage = new Message(messages[messages.length - i]);
-    newMessage.appendItem(UI_ELEMENTS.MESSAGES);
+    newMessage.appendItem(CHAT.LIST);
   }
 
   MESSAGES.START += 20;
@@ -15,7 +15,7 @@ export function renderMessages(messages, startMessage = MESSAGES.START, countMes
 }
 
 export function renderMessageOnScroll() {
-  const positionScroll = UI_ELEMENTS.MESSAGES.scrollTop - UI_ELEMENTS.MESSAGES.offsetHeight;
-  const threshold = positionScroll + UI_ELEMENTS.MESSAGES.scrollHeight <= 50;
+  const positionScroll = CHAT.LIST.scrollTop - CHAT.LIST.offsetHeight;
+  const threshold = positionScroll + CHAT.LIST.scrollHeight <= 50;
   if (threshold) renderMessages(MESSAGES.STORAGE);
 }

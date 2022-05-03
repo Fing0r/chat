@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { UI_ELEMENTS } from "./uiElements";
+import { CHAT, BUTTONS } from "./uiElements";
 import {
   requestForCode, requestForChangeName, importMessage, requestForAccountData,
 } from "./request";
@@ -14,10 +14,10 @@ import SOCKET from "./webSocket";
 
 export function sendMessage(e) {
   e.preventDefault();
-  const { value } = UI_ELEMENTS.INPUT;
+  const { value } = CHAT.INPUT;
   if (!value) return;
   SOCKET.sendMessage(value);
-  UI_ELEMENTS.INPUT.value = "";
+  CHAT.INPUT.value = "";
 }
 
 export async function getCode(e) {
@@ -33,7 +33,7 @@ export async function getCode(e) {
     hideMessage(e);
     clearForm(e);
     modal.classList.remove("open");
-    UI_ELEMENTS.AUTHORIZATION.dataset.modal = "confirmation";
+    BUTTONS.AUTHORIZATION.dataset.modal = "confirmation";
   } catch (error) {
     showMessage(e, error.message);
   }
@@ -53,9 +53,9 @@ export async function changeName(e) {
     showMessage(e, "Вы сменили ник");
     AUTHOR.NAME = name.trim();
     changeNameOldMessages();
-
     // hideMessage(e);
     const token = getToken();
+    SOCKET.init(token);
     await requestForChangeName(name, token);
   } catch (error) {
     showMessage(e, error.message);
@@ -65,9 +65,9 @@ export async function changeName(e) {
 function stateUIElements(email, name) {
   AUTHOR.EMAIL = email;
   AUTHOR.NAME = name || "Я";
-  UI_ELEMENTS.NAME.value = AUTHOR.NAME;
-  UI_ELEMENTS.EXIT.style.display = name ? "block" : "none";
-  UI_ELEMENTS.AUTHORIZATION.style.display = name ? "none" : "block";
+  CHAT.NAME.value = AUTHOR.NAME;
+  BUTTONS.EXIT.style.display = name ? "block" : "none";
+  BUTTONS.AUTHORIZATION.style.display = name ? "none" : "block";
 }
 
 async function getAccountData(token) {
@@ -84,27 +84,28 @@ export async function saveToken(e) {
 
     await getAccountData(token);
     setCookiesToken(token);
-    document.querySelector(".chat__btns").style.zIndex = "101";
 
     const modal = e.target.closest(".modal");
     modal.classList.remove("open");
+    SOCKET.init(token);
 
-    loader(UI_ELEMENTS.DIALOG);
+    document.querySelector(".chat__btns").style.zIndex = "101";
+    loader(CHAT.BOX);
     clearForm(e);
     MESSAGES.STORAGE = await importMessage();
     renderMessages(MESSAGES.STORAGE);
-
-    SOCKET.init(token);
   } catch (error) {
     showMessage(e, "Введите верный код");
+    document.querySelector(".chat__btns").style.zIndex = "101";
+    loader(CHAT.BOX);
   } finally {
-    loader(UI_ELEMENTS.DIALOG);
     document.querySelector(".chat__btns").style.zIndex = null;
+    loader(CHAT.BOX);
   }
 }
 
 export async function loadPage() {
-  loader(UI_ELEMENTS.CHAT);
+  loader(CHAT.BODY);
   try {
     const token = getToken();
     await getAccountData(token);
@@ -116,17 +117,17 @@ export async function loadPage() {
     console.log(error.message);
     stateUIElements();
   } finally {
-    loader(UI_ELEMENTS.CHAT);
+    loader(CHAT.BODY);
   }
 }
 
 export function signOut() {
   Cookies.remove("token");
   SOCKET.disconnect();
-  UI_ELEMENTS.MESSAGES.replaceChildren();
+  CHAT.LIST.replaceChildren();
   stateUIElements();
   MESSAGES.START = 1;
   MESSAGES.END = 20;
   MESSAGES.STORAGE = [];
-  UI_ELEMENTS.AUTHORIZATION.dataset.modal = "authorization";
+  BUTTONS.AUTHORIZATION.dataset.modal = "authorization";
 }

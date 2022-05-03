@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { UI_ELEMENTS } from "./uiElements";
+import { CHAT } from "./uiElements";
 
 export const clearForm = (e) => e.target.closest(".form").reset();
 
@@ -17,16 +17,16 @@ export function getToken() {
 }
 
 export function scrollToBottom() {
-  const element = UI_ELEMENTS.MESSAGES.firstElementChild;
+  const element = CHAT.LIST.firstElementChild;
   const options = { block: "end", behavior: "smooth" };
 
   element.scrollIntoView(options);
 }
 
 export function showArrowOnScroll() {
-  const isNotStart = (-UI_ELEMENTS.MESSAGES.scrollTop > UI_ELEMENTS.MESSAGES.offsetHeight);
-  UI_ELEMENTS.START.style.opacity = isNotStart ? "1" : null;
-  UI_ELEMENTS.START.style.visibility = isNotStart ? "visible" : null;
+  const isNotStart = (-CHAT.LIST.scrollTop > CHAT.LIST.offsetHeight);
+  CHAT.START.style.opacity = isNotStart ? "1" : null;
+  CHAT.START.style.visibility = isNotStart ? "visible" : null;
 }
 
 export function setCookiesToken(token) {

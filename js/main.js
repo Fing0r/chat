@@ -1,5 +1,5 @@
 import { throttle, scrollToBottom, showArrowOnScroll } from "./helper";
-import { UI_ELEMENTS, FORM } from "./uiElements";
+import { CHAT, FORM, BUTTONS } from "./uiElements";
 import {
   sendMessage, getCode, saveToken, changeName, loadPage, signOut,
 } from "./view";
@@ -11,15 +11,15 @@ const showArrowOnScrollThrottle = throttle(showArrowOnScroll, 200);
 
 document.addEventListener("DOMContentLoaded", loadPage);
 
-UI_ELEMENTS.SETTINGS.addEventListener("click", newModal);
-UI_ELEMENTS.AUTHORIZATION.addEventListener("click", newModal);
+BUTTONS.SETTINGS.addEventListener("click", newModal);
+BUTTONS.AUTHORIZATION.addEventListener("click", newModal);
+BUTTONS.EXIT.addEventListener("click", signOut);
 
 FORM.CODE.addEventListener("submit", getCode);
 FORM.MESSAGE.addEventListener("submit", sendMessage);
 FORM.LOGIN.addEventListener("submit", saveToken);
 FORM.CHANGE_NAME.addEventListener("submit", changeName);
 
-UI_ELEMENTS.EXIT.addEventListener("click", signOut);
-UI_ELEMENTS.START.addEventListener("click", scrollToBottom);
-UI_ELEMENTS.MESSAGES.addEventListener("scroll", renderMessageOnScrollThrottle);
-UI_ELEMENTS.MESSAGES.addEventListener("scroll", showArrowOnScrollThrottle);
+CHAT.START.addEventListener("click", scrollToBottom);
+CHAT.LIST.addEventListener("scroll", renderMessageOnScrollThrottle);
+CHAT.LIST.addEventListener("scroll", showArrowOnScrollThrottle);

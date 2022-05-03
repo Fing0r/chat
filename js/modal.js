@@ -4,6 +4,20 @@ function ModalActions(e) {
   this.closeBtn = this.modal.querySelector(".modal__close");
   this.form = this.modal.querySelector(".form");
 
+  this.hideAlert = (e) => {
+    this.input = e.target;
+
+    const isNotHasDataInput = this.input.dataset.input === undefined;
+    if (isNotHasDataInput) return;
+
+    const isNotHasNote = !this.form.classList.contains("note");
+    if (isNotHasNote) return;
+
+    this.form.classList.remove("note");
+  };
+
+  this.form.addEventListener("input", this.hideAlert);
+
   this.closeModal = () => {
     this.modal.classList.remove("open");
     this.removeListeners();
@@ -13,8 +27,8 @@ function ModalActions(e) {
     // this.form.addEventListener("submit", this.closeModal);
   };
 
-  this.closeModalOutsideOfContent = (event) => {
-    if (event.target !== this.modal) return;
+  this.closeModalOutsideOfContent = (e) => {
+    if (e.target !== this.modal) return;
     this.closeModal();
   };
 

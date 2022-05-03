@@ -1,8 +1,8 @@
 export const URL = {
-  AUTORIZATION: "https://mighty-cove-31255.herokuapp.com/api/user",
+  AUTHORIZATION: "https://mighty-cove-31255.herokuapp.com/api/user",
   CHANGE_NAME: "https://mighty-cove-31255.herokuapp.com/api/user/me",
   MESSAGE: "https://mighty-cove-31255.herokuapp.com/api/messages",
-  SOCKET: "ws://mighty-cove-31255.herokuapp.com/websockets?",
+  SOCKET: "wss://mighty-cove-31255.herokuapp.com/websockets?",
 };
 export const AUTHOR = {
   NAME: "Я",
