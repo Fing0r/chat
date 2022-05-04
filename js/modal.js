@@ -1,8 +1,13 @@
-function ModalActions(e) {
-  this.dataModal = e.target.dataset.modal;
+function ModalActions(dataset) {
+  this.dataModal = dataset;
   this.modal = document.querySelector(`#${this.dataModal}`);
   this.closeBtn = this.modal.querySelector(".modal__close");
   this.form = this.modal.querySelector(".form");
+
+  this.closeModalOutsideOfContent = (e) => {
+    if (e.target !== this.modal) return;
+    this.closeModal();
+  };
 
   this.hideAlert = (e) => {
     this.input = e.target;
@@ -16,33 +21,17 @@ function ModalActions(e) {
     this.form.classList.remove("note");
   };
 
+  this.openModal = () => this.modal.classList.add("open");
+  this.closeModal = () => this.modal.classList.remove("open");
   this.form.addEventListener("input", this.hideAlert);
-
-  this.closeModal = () => {
-    this.modal.classList.remove("open");
-    this.removeListeners();
-  };
-
-  this.submitCloseModal = () => {
-    this.form.addEventListener("submit", this.closeModal);
-  };
-
-  this.closeModalOutsideOfContent = (e) => {
-    if (e.target !== this.modal) return;
-    this.closeModal();
-  };
-
-  this.removeListeners = () => {
-    this.modal.removeEventListener("click", this.closeModal);
-    this.closeBtn.removeEventListener("click", this.closeModal);
-    this.modal.removeEventListener("click", this.closeModalOutsideOfContent);
-  };
-
-  this.modal.classList.add("open");
   this.closeBtn.addEventListener("click", this.closeModal);
   this.modal.addEventListener("click", this.closeModalOutsideOfContent);
 }
 
-export default function newModal(e) {
-  return new ModalActions(e);
-}
+const INIT_MODAL = {
+  SETTINGS: new ModalActions("settings"),
+  AUTHORIZATION: new ModalActions("authorization"),
+  CONFIRMATION: new ModalActions("confirmation"),
+};
+
+export default INIT_MODAL;

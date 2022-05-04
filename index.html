@@ -65,11 +65,11 @@
             <h3 class="modal__title modal__title--settings">Настройки</h3>
             <form class="modal__form modal__form--settings form" action="" data-action="changeName">
               <div class="form__line">
-                <label class="form__label" for="name">
+                <label class="form__label" for="changeName">
                   Имя в чате
                 </label>
                 <div class="form__holder">
-                  <input class="form__input input" type="text" name="name" data-input="true">
+                  <input class="form__input input" id="changeName" type="text" name="name" data-input="true">
                   <button class="form__btn  btn btn--min" type="submit">-></button>
                 </div>
                 <span class="alert">Ошибка</span>
@@ -86,11 +86,11 @@
             <h3 class="modal__title">Подтверждение</h3>
             <form class="modal__form form" action="" data-action="login">
               <div class="form__line">
-                <label class="form__label" for="email">
+                <label class="form__label" for="saveCode">
                   Код:
                 </label>
                 <div class="form__holder">
-                  <input class="form__input input" type="text" name="code" data-input="true">
+                  <input class="form__input input" type="text" id="saveCode" name="code" data-input="true">
                 </div>
                 <button class="form__btn btn btn--big" type="submit">
                   Войти
@@ -109,11 +109,11 @@
             <h3 class="modal__title">Авторизация</h3>
             <form class="modal__form modal__form--code form" action="" data-modal="confirmation" data-action="code">
               <div class="modal__line">
-                <label class="form__label" for="email">
+                <label class="form__label" for="saveEmail">
                   Почта:
                 </label>
                 <div class="form__holder">
-                  <input class="form__input input" type="email" name="email" required data-input="true">
+                  <input class="form__input input" id="saveEmail" type="email" name="email" required data-input="true">
                 </div>
                 <button class="form__btn btn btn--big" type="submit">
                   Получить код
@@ -121,6 +121,7 @@
                 <span class="alert">Ошибка</span>
               </div>
             </form>
+            <button class="modal__code" data-modal="confirmation">Код уже есть?</button>
           </div>
         </div>
       </div>

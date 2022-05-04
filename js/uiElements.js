@@ -11,12 +11,13 @@ export const CHAT = {
 
 export const BUTTONS = {
   SETTINGS: document.querySelector("[data-modal='settings']"),
-  CONFIRMATION: document.querySelector("[data-modal='confirmation']"),
+  CONFIRMATION: document.querySelector("button[data-modal='confirmation']"),
   AUTHORIZATION: document.querySelector("[data-modal='authorization']"),
   EXIT: document.querySelector("[data-action='logout']"),
 };
 
 export const FORM = {
+  CONFIRMATION: document.querySelector(".form[data-modal='confirmation']"),
   BODY: document.querySelector(".form"),
   CHANGE_NAME: document.querySelector("[data-action='changeName']"),
   LOGIN: document.querySelector("[data-action='login']"),

@@ -4,13 +4,18 @@ import {
   requestForCode, requestForChangeName, importMessage, requestForAccountData,
 } from "./request";
 import { AUTHOR, MESSAGES } from "./config";
-import newModal from "./modal";
+import INIT_MODAL from "./modal";
 import {
   showMessage, hideMessage, setCookiesToken, clearForm, getValue, getToken,
 } from "./helper";
 import { renderMessages } from "./render";
 import loader from "./loader";
 import SOCKET from "./webSocket";
+
+export function codeIsThere() {
+  INIT_MODAL.AUTHORIZATION.closeModal();
+  INIT_MODAL.CONFIRMATION.openModal();
+}
 
 export function sendMessage(e) {
   e.preventDefault();
@@ -25,15 +30,12 @@ export async function getCode(e) {
 
   try {
     const value = getValue(e);
-
-    const modal = e.target.closest(".modal");
     const response = await requestForCode(value);
     if (!response.ok) throw new Error("Ошибка запроса");
-    newModal(e);
+    INIT_MODAL.AUTHORIZATION.closeModal();
+    INIT_MODAL.CONFIRMATION.openModal();
     hideMessage(e);
     clearForm(e);
-    modal.classList.remove("open");
-    BUTTONS.AUTHORIZATION.dataset.modal = "confirmation";
   } catch (error) {
     showMessage(e, error.message);
   }
@@ -53,8 +55,9 @@ export async function changeName(e) {
     showMessage(e, "Вы сменили ник");
     AUTHOR.NAME = name.trim();
     changeNameOldMessages();
+
     const token = getToken();
-    SOCKET.init(token);
+    SOCKET.reconnect(token);
     await requestForChangeName(name, token);
   } catch (error) {
     showMessage(e, error.message);
@@ -77,7 +80,7 @@ async function getAccountData(token) {
 }
 
 export async function saveToken(e) {
-  const chatBtns = document.querySelector(".chat__btns")
+  const chatBtns = document.querySelector(".chat__btns");
   try {
     e.preventDefault();
     const token = getValue(e);
@@ -85,8 +88,7 @@ export async function saveToken(e) {
     await getAccountData(token);
     setCookiesToken(token);
 
-    const modal = e.target.closest(".modal");
-    modal.classList.remove("open");
+    INIT_MODAL.CONFIRMATION.closeModal();
     SOCKET.init(token);
 
     chatBtns.style.zIndex = "101";
@@ -129,5 +131,4 @@ export function signOut() {
   MESSAGES.START = 1;
   MESSAGES.END = 20;
   MESSAGES.STORAGE = [];
-  BUTTONS.AUTHORIZATION.dataset.modal = "authorization";
 }

@@ -43,6 +43,11 @@ function ConnectSocket() {
     this.checkError();
     this.checkClose();
   };
+
+  this.reconnect = (token) => {
+    this.disconnect();
+    this.init(token);
+  };
 }
 
 const SOCKET = new ConnectSocket();
