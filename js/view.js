@@ -53,7 +53,6 @@ export async function changeName(e) {
     showMessage(e, "Вы сменили ник");
     AUTHOR.NAME = name.trim();
     changeNameOldMessages();
-    // hideMessage(e);
     const token = getToken();
     SOCKET.init(token);
     await requestForChangeName(name, token);
@@ -78,6 +77,7 @@ async function getAccountData(token) {
 }
 
 export async function saveToken(e) {
+  const chatBtns = document.querySelector(".chat__btns")
   try {
     e.preventDefault();
     const token = getValue(e);
@@ -89,14 +89,14 @@ export async function saveToken(e) {
     modal.classList.remove("open");
     SOCKET.init(token);
 
-    document.querySelector(".chat__btns").style.zIndex = "101";
+    chatBtns.style.zIndex = "101";
     loader(CHAT.BOX);
     clearForm(e);
     MESSAGES.STORAGE = await importMessage();
     renderMessages(MESSAGES.STORAGE);
   } catch (error) {
     showMessage(e, "Введите верный код");
-    document.querySelector(".chat__btns").style.zIndex = "101";
+    chatBtns.style.zIndex = "101";
     loader(CHAT.BOX);
   } finally {
     document.querySelector(".chat__btns").style.zIndex = null;

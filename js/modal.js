@@ -24,7 +24,7 @@ function ModalActions(e) {
   };
 
   this.submitCloseModal = () => {
-    // this.form.addEventListener("submit", this.closeModal);
+    this.form.addEventListener("submit", this.closeModal);
   };
 
   this.closeModalOutsideOfContent = (e) => {
