@@ -1,134 +1,159 @@
-import Cookies from "js-cookie";
-import { CHAT, BUTTONS } from "./uiElements";
-import {
-  requestForCode, requestForChangeName, importMessage, requestForAccountData,
-} from "./request";
-import { AUTHOR, MESSAGES } from "./config";
-import INIT_MODAL from "./modal";
-import {
-  showMessage, hideMessage, setCookiesToken, clearForm, getValue, getToken,
-} from "./helper";
-import { renderMessages } from "./render";
-import loader from "./loader";
-import SOCKET from "./webSocket";
-
-export function codeIsThere() {
-  INIT_MODAL.AUTHORIZATION.closeModal();
-  INIT_MODAL.CONFIRMATION.openModal();
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.signOut = exports.loadPage = exports.saveToken = exports.changeName = exports.getCode = exports.sendMessage = exports.codeIsThere = void 0;
+const js_cookie_1 = __importDefault(require("js-cookie"));
+const uiElements_1 = require("./uiElements");
+const request_1 = require("./request");
+const config_1 = require("./config");
+const modal_1 = require("./modal");
+const helper_1 = require("./helper");
+const render_1 = require("./render");
+const loader_1 = require("./loader");
+const webSocket_1 = require("./webSocket");
+const CustomError_1 = require("./CustomError");
+function codeIsThere() {
+    modal_1.INIT_MODAL.AUTHORIZATION.close();
+    modal_1.INIT_MODAL.CONFIRMATION.open();
 }
-
-export function sendMessage(e) {
-  e.preventDefault();
-  const { value } = CHAT.INPUT;
-  if (!value) return;
-  SOCKET.sendMessage(value);
-  CHAT.INPUT.value = "";
+exports.codeIsThere = codeIsThere;
+function sendMessage(e) {
+    e.preventDefault();
+    const { value } = uiElements_1.CHAT.INPUT;
+    if (!value)
+        return;
+    webSocket_1.SOCKET.sendMessage(value);
+    uiElements_1.CHAT.INPUT.value = "";
 }
-
-export async function getCode(e) {
-  e.preventDefault();
-
-  try {
-    const value = getValue(e);
-    const response = await requestForCode(value);
-    if (!response.ok) throw new Error("Ошибка запроса");
-    INIT_MODAL.AUTHORIZATION.closeModal();
-    INIT_MODAL.CONFIRMATION.openModal();
-    hideMessage(e);
-    clearForm(e);
-  } catch (error) {
-    showMessage(e, error.message);
-  }
+exports.sendMessage = sendMessage;
+function getCode(e) {
+    return __awaiter(this, void 0, void 0, function* () {
+        e.preventDefault();
+        try {
+            const value = (0, helper_1.getValue)(e);
+            if (!value)
+                return;
+            yield (0, request_1.requestForCode)(value);
+            modal_1.INIT_MODAL.AUTHORIZATION.close();
+            modal_1.INIT_MODAL.CONFIRMATION.open();
+            (0, helper_1.hideMessage)(e);
+            (0, helper_1.clearForm)(e);
+        }
+        catch (error) {
+            if (error instanceof CustomError_1.ResponseError)
+                console.log(error.message);
+            if (error instanceof Error)
+                (0, helper_1.showMessage)(e, error.message);
+        }
+    });
 }
-
+exports.getCode = getCode;
 function changeNameOldMessages() {
-  [...MESSAGES.USER].forEach((element) => {
-    const messageName = element.querySelector(".message__name");
-    messageName.textContent = AUTHOR.NAME;
-  });
+    [...config_1.MESSAGES.USER].forEach((element) => {
+        const messageName = element.querySelector(".message__name");
+        messageName.textContent = config_1.AUTHOR.NAME;
+    });
 }
-
-export async function changeName(e) {
-  try {
-    e.preventDefault();
-    const { value: name } = e.target.querySelector(".form__input");
-    showMessage(e, "Вы сменили ник");
-    AUTHOR.NAME = name.trim();
-    changeNameOldMessages();
-
-    const token = getToken();
-    SOCKET.reconnect(token);
-    await requestForChangeName(name, token);
-  } catch (error) {
-    showMessage(e, error.message);
-  }
+function changeName(e) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            e.preventDefault();
+            const { value: name } = e.target.querySelector(".form__input");
+            if (!name)
+                return;
+            (0, helper_1.showMessage)(e, "Вы сменили ник");
+            config_1.AUTHOR.NAME = name.trim();
+            changeNameOldMessages();
+            const token = (0, helper_1.getToken)();
+            if (typeof token === "string") {
+                yield (0, request_1.requestForChangeName)(name, token);
+                webSocket_1.SOCKET.reconnect(token);
+            }
+        }
+        catch (error) {
+            if (error instanceof Error)
+                (0, helper_1.showMessage)(e, error.message);
+        }
+    });
 }
-
+exports.changeName = changeName;
 function stateUIElements(email, name) {
-  AUTHOR.EMAIL = email;
-  AUTHOR.NAME = name || "Я";
-  CHAT.NAME.value = AUTHOR.NAME;
-  BUTTONS.EXIT.style.display = name ? "block" : "none";
-  BUTTONS.AUTHORIZATION.style.display = name ? "none" : "block";
+    config_1.AUTHOR.EMAIL = email || "";
+    config_1.AUTHOR.NAME = name || "Я";
+    uiElements_1.CHAT.NAME.value = config_1.AUTHOR.NAME;
+    uiElements_1.BUTTONS.EXIT.style.display = name ? "block" : "none";
+    uiElements_1.BUTTONS.AUTHORIZATION.style.display = name ? "none" : "block";
 }
-
-async function getAccountData(token) {
-  const response = await requestForAccountData(token);
-  if (!response.ok) throw new Error("Ошибка запроса");
-  const { email, name } = await response.json();
-  stateUIElements(email, name);
+function getAccountData(token) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield (0, request_1.requestForAccountData)(token);
+        if (!response.ok)
+            throw new Error("Ошибка запроса");
+        const { email, name } = yield response.json();
+        stateUIElements(email, name);
+    });
 }
-
-export async function saveToken(e) {
-  const chatBtns = document.querySelector(".chat__btns");
-  try {
-    e.preventDefault();
-    const token = getValue(e);
-
-    await getAccountData(token);
-    setCookiesToken(token);
-
-    INIT_MODAL.CONFIRMATION.closeModal();
-    SOCKET.init(token);
-
-    chatBtns.style.zIndex = "101";
-    loader(CHAT.BOX);
-    clearForm(e);
-    MESSAGES.STORAGE = await importMessage();
-    renderMessages(MESSAGES.STORAGE);
-  } catch (error) {
-    showMessage(e, "Введите верный код");
-    chatBtns.style.zIndex = "101";
-    loader(CHAT.BOX);
-  } finally {
-    document.querySelector(".chat__btns").style.zIndex = null;
-    loader(CHAT.BOX);
-  }
+function saveToken(e) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const chatBtns = document.querySelector(".chat__btns");
+        try {
+            e.preventDefault();
+            const token = (0, helper_1.getValue)(e);
+            if (!token)
+                return;
+            yield getAccountData(token);
+            (0, helper_1.setCookiesToken)(token);
+            modal_1.INIT_MODAL.CONFIRMATION.close();
+            webSocket_1.SOCKET.init(token);
+            chatBtns.style.zIndex = "101";
+            (0, loader_1.loader)(uiElements_1.CHAT.BOX);
+            (0, helper_1.clearForm)(e);
+            config_1.MESSAGES.STORAGE = yield (0, request_1.importMessage)();
+            (0, render_1.renderMessages)(config_1.MESSAGES.STORAGE);
+        }
+        catch (error) {
+            (0, helper_1.showMessage)(e, "Введите верный код");
+            chatBtns.style.zIndex = "101";
+            (0, loader_1.loader)(uiElements_1.CHAT.BOX);
+        }
+        finally {
+            chatBtns.style.zIndex = '';
+            (0, loader_1.loader)(uiElements_1.CHAT.BOX);
+        }
+    });
 }
-
-export async function loadPage() {
-  loader(CHAT.BODY);
-  try {
-    const token = getToken();
-    await getAccountData(token);
-    SOCKET.init(token);
-
-    MESSAGES.STORAGE = await importMessage();
-    renderMessages(MESSAGES.STORAGE);
-  } catch (error) {
-    console.log(error.message);
+exports.saveToken = saveToken;
+function loadPage() {
+    return __awaiter(this, void 0, void 0, function* () {
+        (0, loader_1.loader)(uiElements_1.CHAT.BODY);
+        try {
+            const token = (0, helper_1.getToken)();
+            if (typeof token === "string") {
+                yield getAccountData(token);
+                webSocket_1.SOCKET.init(token);
+            }
+            config_1.MESSAGES.STORAGE = yield (0, request_1.importMessage)();
+            (0, render_1.renderMessages)(config_1.MESSAGES.STORAGE);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                console.log(error.message);
+            }
+            stateUIElements();
+        }
+        finally {
+            (0, loader_1.loader)(uiElements_1.CHAT.BODY);
+        }
+    });
+}
+exports.loadPage = loadPage;
+function signOut() {
+    js_cookie_1.default.remove("token");
+    webSocket_1.SOCKET.disconnect();
+    uiElements_1.CHAT.LIST.replaceChildren();
     stateUIElements();
-  } finally {
-    loader(CHAT.BODY);
-  }
+    config_1.MESSAGES.START = 1;
+    config_1.MESSAGES.END = 20;
+    config_1.MESSAGES.STORAGE = [];
 }
-
-export function signOut() {
-  Cookies.remove("token");
-  SOCKET.disconnect();
-  CHAT.LIST.replaceChildren();
-  stateUIElements();
-  MESSAGES.START = 1;
-  MESSAGES.END = 20;
-  MESSAGES.STORAGE = [];
-}
+exports.signOut = signOut;
+// export async function getCode(e: {target: HTMLElement, preventDefault(): void}): Promise<void> {

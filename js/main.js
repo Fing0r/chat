@@ -1,26 +1,21 @@
-import { throttle, scrollToBottom, showArrowOnScroll } from "./helper";
-import { CHAT, FORM, BUTTONS } from "./uiElements";
-import {
-  sendMessage, getCode, saveToken, changeName, loadPage, signOut, codeIsThere,
-} from "./view";
-import { renderMessageOnScroll } from "./render";
-import INIT_MODAL from "./modal";
-
-const renderMessageOnScrollThrottle = throttle(renderMessageOnScroll, 300);
-const showArrowOnScrollThrottle = throttle(showArrowOnScroll, 200);
-
-document.addEventListener("DOMContentLoaded", loadPage);
-
-BUTTONS.SETTINGS.addEventListener("click", INIT_MODAL.SETTINGS.openModal);
-BUTTONS.AUTHORIZATION.addEventListener("click", INIT_MODAL.AUTHORIZATION.openModal);
-BUTTONS.CONFIRMATION.addEventListener("click", codeIsThere);
-BUTTONS.EXIT.addEventListener("click", signOut);
-
-FORM.CODE.addEventListener("submit", getCode);
-FORM.MESSAGE.addEventListener("submit", sendMessage);
-FORM.LOGIN.addEventListener("submit", saveToken);
-FORM.CHANGE_NAME.addEventListener("submit", changeName);
-
-CHAT.START.addEventListener("click", scrollToBottom);
-CHAT.LIST.addEventListener("scroll", renderMessageOnScrollThrottle);
-CHAT.LIST.addEventListener("scroll", showArrowOnScrollThrottle);
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const helper_1 = require("./helper");
+const uiElements_1 = require("./uiElements");
+const view_1 = require("./view");
+const render_1 = require("./render");
+const modal_1 = require("./modal");
+const renderMessageOnScrollThrottle = (0, helper_1.throttle)(render_1.renderMessageOnScroll, 300);
+const showArrowOnScrollThrottle = (0, helper_1.throttle)(helper_1.showArrowOnScroll, 200);
+document.addEventListener("DOMContentLoaded", view_1.loadPage);
+uiElements_1.BUTTONS.SETTINGS.addEventListener("click", () => modal_1.INIT_MODAL.SETTINGS.open());
+uiElements_1.BUTTONS.AUTHORIZATION.addEventListener("click", () => modal_1.INIT_MODAL.AUTHORIZATION.open());
+uiElements_1.BUTTONS.CONFIRMATION.addEventListener("click", view_1.codeIsThere);
+uiElements_1.BUTTONS.EXIT.addEventListener("click", view_1.signOut);
+uiElements_1.FORM.CODE.addEventListener("submit", view_1.getCode);
+uiElements_1.FORM.MESSAGE.addEventListener("submit", view_1.sendMessage);
+uiElements_1.FORM.LOGIN.addEventListener("submit", view_1.saveToken);
+uiElements_1.FORM.CHANGE_NAME.addEventListener("submit", view_1.changeName);
+uiElements_1.CHAT.START.addEventListener("click", helper_1.scrollToBottom);
+uiElements_1.CHAT.LIST.addEventListener("scroll", renderMessageOnScrollThrottle);
+uiElements_1.CHAT.LIST.addEventListener("scroll", showArrowOnScrollThrottle);

@@ -1,55 +1,65 @@
-import Message from "./message";
-import { CHAT } from "./uiElements";
-import { getToken, scrollToBottom } from "./helper";
-import { URL } from "./config";
-
-function ConnectSocket() {
-  this.data = (e) => JSON.parse(e.data);
-  this.checkMessage = () => this.socket.addEventListener("message", this.renderMessage);
-  this.sendMessage = (text) => this.socket.send(JSON.stringify({ text }));
-  this.socket = null;
-
-  this.renderMessage = (e) => {
-    const message = new Message(this.data(e));
-    message.prependItem(CHAT.LIST);
-    scrollToBottom();
-  };
-
-  this.checkError = () => {
-    this.socket.addEventListener("error", () => {
-      console.log(`[error] ${error.message}`);
-    });
-  };
-
-  this.checkClose = () => {
-    this.socket.addEventListener("close", (e) => {
-      if (e.wasClean) {
-        console.log(`[close] Соединение закрыто чисто, код=${e.code} причина=${e.reason}`);
-      } else {
-        console.log("[close] Соединение прервано");
-        const token = getToken();
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SOCKET = void 0;
+const message_1 = require("./message");
+const uiElements_1 = require("./uiElements");
+const helper_1 = require("./helper");
+const config_1 = require("./config");
+class Socket {
+    constructor() {
+        this.socket = null;
+    }
+    init(token) {
+        this.socket = new WebSocket(`${config_1.URL.SOCKET}${token}`);
+    }
+    disconnect() {
+        var _a;
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.close(1000, "Работа закончена");
+    }
+    reconnect(token) {
+        this.disconnect();
         this.init(token);
-      }
-    });
-  };
-
-  this.disconnect = () => {
-    this.socket.close(1000, "Работа закончена");
-  };
-
-  this.init = (token) => {
-    this.socket = new WebSocket(`${URL.SOCKET}${token}`);
-    this.checkMessage();
-    this.checkError();
-    this.checkClose();
-  };
-
-  this.reconnect = (token) => {
-    this.disconnect();
-    this.init(token);
-  };
+    }
 }
-
-const SOCKET = new ConnectSocket();
-
-export default SOCKET;
+class ListenerSocket extends Socket {
+    init(token) {
+        var _a, _b;
+        super.init(token);
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.addEventListener("close", (e) => this.close(e));
+        (_b = this.socket) === null || _b === void 0 ? void 0 : _b.addEventListener("error", this.error);
+    }
+    error() {
+        console.log("Ошибка соединения");
+    }
+    close(e) {
+        if (e.wasClean) {
+            console.log(`[close] Соединение закрыто чисто, код=${e.code} причина=${e.reason}`);
+        }
+        else {
+            console.log("[close] Соединение прервано");
+            const token = (0, helper_1.getToken)();
+            if (typeof token === "string")
+                this.init(token);
+        }
+    }
+    ;
+}
+class MessageSocket extends ListenerSocket {
+    init(token) {
+        var _a;
+        super.init(token);
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.addEventListener("message", (e) => this.renderMessage(e));
+    }
+    sendMessage(text) {
+        var _a;
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({ text }));
+    }
+    renderMessage(e) {
+        const newData = JSON.parse(e.data);
+        const message = new message_1.Message(newData);
+        message.prependItem(uiElements_1.CHAT.LIST);
+        (0, helper_1.scrollToBottom)();
+    }
+    ;
+}
+exports.SOCKET = new MessageSocket();

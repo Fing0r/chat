@@ -8,7 +8,7 @@
   <title>Title</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="style.css?version=0" rel="stylesheet">
-  <script defer src="./js/main.js?version=0" type="module"></script>
+  <script defer src="typescript/main.ts?version=0" type="module"></script>
 </head>
 
 <body>
@@ -130,12 +130,14 @@
   </div>
 
   <template id="messageTemplate">
-    <div class="message__box">
-      <div class="message__info">
-        <span class="message__name"></span>:&nbsp;<span class="message__text"></span>
+    <li class="message">
+      <div class="message__box">
+        <div class="message__info">
+          <span class="message__name"></span>:&nbsp;<span class="message__text"></span>
+        </div>
+        <div class="message__time"></div>
       </div>
-      <div class="message__time"></div>
-    </div>
+    </li>
   </template>
 </body>
 

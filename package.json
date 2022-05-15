@@ -11,6 +11,8 @@
   "author": "fin",
   "license": "ISC",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.23.0",
+    "@typescript-eslint/parser": "^5.23.0",
     "eslint": "^8.12.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-google": "^0.14.0",
@@ -18,9 +20,11 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.0.0",
     "parcel": "^2.4.1",
-    "prettier": "^2.6.2"
+    "prettier": "^2.6.2",
+    "typescript": "^4.6.4"
   },
   "dependencies": {
+    "@types/js-cookie": "^3.0.2",
     "date-fns": "^2.28.0",
     "debounce": "^1.2.1",
     "js-cookie": "^3.0.1",
