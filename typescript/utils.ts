@@ -59,9 +59,7 @@ export function hideMessage(e: Event) {
 
 export function hideAlert(e: Event): void {
     const input = e.target as HTMLInputElement;
-    console.log("=> input", input);
     if (!input.dataset.input) return;
-    console.log(123)
     const form = input.closest(".form") as HTMLFormElement
     const isNotHasNote: boolean = !form.classList.contains("note");
 

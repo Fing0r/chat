@@ -66,10 +66,8 @@ function hideMessage(e) {
 exports.hideMessage = hideMessage;
 function hideAlert(e) {
     const input = e.target;
-    console.log("=> input", input);
     if (!input.dataset.input)
         return;
-    console.log(123);
     const form = input.closest(".form");
     const isNotHasNote = !form.classList.contains("note");
     if (isNotHasNote)
