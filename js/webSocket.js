@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SOCKET = void 0;
 const message_1 = require("./message");
 const uiElements_1 = require("./uiElements");
-const helper_1 = require("./helper");
+const utils_1 = require("./utils");
 const config_1 = require("./config");
 class Socket {
     constructor() {
@@ -37,7 +37,7 @@ class ListenerSocket extends Socket {
         }
         else {
             console.log("[close] Соединение прервано");
-            const token = (0, helper_1.getToken)();
+            const token = (0, utils_1.getToken)();
             if (typeof token === "string")
                 this.init(token);
         }
@@ -52,13 +52,13 @@ class MessageSocket extends ListenerSocket {
     }
     sendMessage(text) {
         var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({ text }));
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.send((0, utils_1.checkJSON)({ text }, false));
     }
     renderMessage(e) {
-        const newData = JSON.parse(e.data);
+        const newData = (0, utils_1.checkJSON)(e.data, true);
         const message = new message_1.Message(newData);
         message.prependItem(uiElements_1.CHAT.LIST);
-        (0, helper_1.scrollToBottom)();
+        (0, utils_1.scrollToBottom)();
     }
     ;
 }

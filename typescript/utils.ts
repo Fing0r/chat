@@ -2,6 +2,14 @@ import Cookies from "js-cookie";
 import { CHAT } from "./uiElements";
 import { TokenRequiredError } from "./CustomError";
 
+export function checkJSON(data: string | object , parse: boolean) {
+    try {
+        return parse ? JSON.parse(<string>data) : JSON.stringify(data);
+    } catch (error) {
+        if (error instanceof Error) alert(`Ошибка JSON: ${error.message}`)
+    }
+}
+
 export function clearForm(e: {target: HTMLElement}): void{
     const form = e.target.closest(".form") as HTMLFormElement
     form.reset();
@@ -43,9 +51,21 @@ export function showMessage(e: Event, text: string | unknown) {
 }
 
 export function hideMessage(e: Event) {
-    const form = e.target   as HTMLFormElement;
+    const form = e.target as HTMLFormElement;
     const formError = form.querySelector(".alert") as HTMLSpanElement;
     if (!formError) return;
+    form.classList.remove("note");
+}
+
+export function hideAlert(e: Event): void {
+    const input = e.target as HTMLInputElement;
+    console.log("=> input", input);
+    if (!input.dataset.input) return;
+    console.log(123)
+    const form = input.closest(".form") as HTMLFormElement
+    const isNotHasNote: boolean = !form.classList.contains("note");
+
+    if (isNotHasNote) return;
     form.classList.remove("note");
 }
 

@@ -1,9 +1,10 @@
-import { URL, METHODS, HEADERS } from "./config";
-import { ResponseError } from "./CustomError";
-import { MessageInfo } from "./message";
+import {HEADERS, METHODS, URL} from "./config";
+import {ResponseError} from "./CustomError";
+import {IMessageInfo} from "./interfaces";
+import { checkJSON } from "./utils"
 
 export async function requestForCode(email: string): Promise<void | ResponseError> {
-    const body: string = JSON.stringify({ email });
+    const body: string = checkJSON({ email } , false);
     const headers = {
         "Content-Type": HEADERS.JSON,
     };
@@ -16,7 +17,7 @@ export async function requestForCode(email: string): Promise<void | ResponseErro
 }
 
 export async function requestForChangeName(name: string, token: string): Promise<void | ResponseError> {
-    const body: string = JSON.stringify({ name });
+    const body: string = checkJSON({ name } , false);
     const headers = {
         "Content-Type": HEADERS.JSON,
         Authorization: HEADERS.TOKEN(token),
@@ -29,10 +30,10 @@ export async function requestForChangeName(name: string, token: string): Promise
     if (!response.ok) throw new ResponseError("при смене имени");
 }
 
-export async function importMessage(): Promise<MessageInfo[]> {
+export async function importMessage(): Promise<IMessageInfo[]> {
     const response = await fetch(URL.MESSAGE);
     if (!response.ok) throw new ResponseError("Неполадки на сервере");
-    const { messages }: {messages: MessageInfo[]} = await response.json();
+    const { messages }: {messages: IMessageInfo[]} = await response.json();
     return messages;
 }
 

@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Message = void 0;
-// @ts-ignore
 const date_fns_1 = require("date-fns");
 const config_1 = require("./config");
 class Message {

@@ -6,7 +6,7 @@ const uiElements_1 = require("./uiElements");
 const request_1 = require("./request");
 const config_1 = require("./config");
 const modal_1 = require("./modal");
-const helper_1 = require("./helper");
+const utils_1 = require("./utils");
 const render_1 = require("./render");
 const loader_1 = require("./loader");
 const webSocket_1 = require("./webSocket");
@@ -29,20 +29,22 @@ function getCode(e) {
     return __awaiter(this, void 0, void 0, function* () {
         e.preventDefault();
         try {
-            const value = (0, helper_1.getValue)(e);
+            const value = (0, utils_1.getValue)(e);
             if (!value)
                 return;
             yield (0, request_1.requestForCode)(value);
             modal_1.INIT_MODAL.AUTHORIZATION.close();
             modal_1.INIT_MODAL.CONFIRMATION.open();
-            (0, helper_1.hideMessage)(e);
-            (0, helper_1.clearForm)(e);
+            (0, utils_1.hideMessage)(e);
+            (0, utils_1.clearForm)(e);
         }
         catch (error) {
-            if (error instanceof CustomError_1.ResponseError)
-                console.log(error.message);
-            if (error instanceof Error)
-                (0, helper_1.showMessage)(e, error.message);
+            if (error instanceof CustomError_1.ResponseError) {
+                (0, utils_1.showMessage)(e, error.message);
+            }
+            else if (error instanceof Error) {
+                (0, utils_1.showMessage)(e, error.message);
+            }
         }
     });
 }
@@ -60,18 +62,25 @@ function changeName(e) {
             const { value: name } = e.target.querySelector(".form__input");
             if (!name)
                 return;
-            (0, helper_1.showMessage)(e, "Вы сменили ник");
+            (0, utils_1.showMessage)(e, "Вы сменили ник");
             config_1.AUTHOR.NAME = name.trim();
             changeNameOldMessages();
-            const token = (0, helper_1.getToken)();
+            const token = (0, utils_1.getToken)();
             if (typeof token === "string") {
                 yield (0, request_1.requestForChangeName)(name, token);
                 webSocket_1.SOCKET.reconnect(token);
             }
         }
         catch (error) {
-            if (error instanceof Error)
-                (0, helper_1.showMessage)(e, error.message);
+            if (error instanceof CustomError_1.TokenRequiredError) {
+                (0, utils_1.showMessage)(e, error.message);
+            }
+            else if (error instanceof CustomError_1.ResponseError) {
+                (0, utils_1.showMessage)(e, error.message);
+            }
+            else {
+                throw error;
+            }
         }
     });
 }
@@ -87,7 +96,7 @@ function getAccountData(token) {
     return __awaiter(this, void 0, void 0, function* () {
         const response = yield (0, request_1.requestForAccountData)(token);
         if (!response.ok)
-            throw new Error("Ошибка запроса");
+            throw new CustomError_1.ResponseError("Ошибка запроса");
         const { email, name } = yield response.json();
         stateUIElements(email, name);
     });
@@ -97,21 +106,21 @@ function saveToken(e) {
         const chatBtns = document.querySelector(".chat__btns");
         try {
             e.preventDefault();
-            const token = (0, helper_1.getValue)(e);
+            const token = (0, utils_1.getValue)(e);
             if (!token)
                 return;
             yield getAccountData(token);
-            (0, helper_1.setCookiesToken)(token);
+            (0, utils_1.setCookiesToken)(token);
             modal_1.INIT_MODAL.CONFIRMATION.close();
             webSocket_1.SOCKET.init(token);
             chatBtns.style.zIndex = "101";
             (0, loader_1.loader)(uiElements_1.CHAT.BOX);
-            (0, helper_1.clearForm)(e);
+            (0, utils_1.clearForm)(e);
             config_1.MESSAGES.STORAGE = yield (0, request_1.importMessage)();
             (0, render_1.renderMessages)(config_1.MESSAGES.STORAGE);
         }
         catch (error) {
-            (0, helper_1.showMessage)(e, "Введите верный код");
+            (0, utils_1.showMessage)(e, "Введите верный код");
             chatBtns.style.zIndex = "101";
             (0, loader_1.loader)(uiElements_1.CHAT.BOX);
         }
@@ -126,7 +135,7 @@ function loadPage() {
     return __awaiter(this, void 0, void 0, function* () {
         (0, loader_1.loader)(uiElements_1.CHAT.BODY);
         try {
-            const token = (0, helper_1.getToken)();
+            const token = (0, utils_1.getToken)();
             if (typeof token === "string") {
                 yield getAccountData(token);
                 webSocket_1.SOCKET.init(token);
@@ -135,10 +144,16 @@ function loadPage() {
             (0, render_1.renderMessages)(config_1.MESSAGES.STORAGE);
         }
         catch (error) {
-            if (error instanceof Error) {
+            stateUIElements();
+            if (error instanceof CustomError_1.TokenRequiredError) {
                 console.log(error.message);
             }
-            stateUIElements();
+            else if (error instanceof CustomError_1.ResponseError) {
+                console.log(error.message);
+            }
+            else {
+                throw error;
+            }
         }
         finally {
             (0, loader_1.loader)(uiElements_1.CHAT.BODY);
@@ -151,8 +166,7 @@ function signOut() {
     webSocket_1.SOCKET.disconnect();
     uiElements_1.CHAT.LIST.replaceChildren();
     stateUIElements();
-    config_1.MESSAGES.START = 1;
-    config_1.MESSAGES.END = 20;
+    config_1.MESSAGES.COUNT_RENDER = 20;
     config_1.MESSAGES.STORAGE = [];
 }
 exports.signOut = signOut;

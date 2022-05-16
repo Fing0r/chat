@@ -3,9 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.requestForAccountData = exports.importMessage = exports.requestForChangeName = exports.requestForCode = void 0;
 const config_1 = require("./config");
 const CustomError_1 = require("./CustomError");
+const utils_1 = require("./utils");
 function requestForCode(email) {
     return __awaiter(this, void 0, void 0, function* () {
-        const body = JSON.stringify({ email });
+        const body = (0, utils_1.checkJSON)({ email }, false);
         const headers = {
             "Content-Type": config_1.HEADERS.JSON,
         };
@@ -19,7 +20,7 @@ function requestForCode(email) {
 exports.requestForCode = requestForCode;
 function requestForChangeName(name, token) {
     return __awaiter(this, void 0, void 0, function* () {
-        const body = JSON.stringify({ name });
+        const body = (0, utils_1.checkJSON)({ name }, false);
         const headers = {
             "Content-Type": config_1.HEADERS.JSON,
             Authorization: config_1.HEADERS.TOKEN(token),

@@ -1,27 +1,8 @@
-import { Message, MessageInfo } from "./message";
+import { Message } from "./message";
+import { IMessageInfo, ISocket, IListenerSocket, IMessageSocket } from "./interfaces"
 import { CHAT } from "./uiElements";
-import {  scrollToBottom, getToken } from "./helper";
+import {scrollToBottom, getToken, checkJSON} from "./utils";
 import { URL } from "./config";
-
-
-interface ISocket {
-    socket: WebSocket | null;
-    init(token: string): void;
-    disconnect(): void;
-    reconnect(token: string): void;
-}
-
-interface IListenerSocket {
-    init(token: string): void;
-    error(): void;
-    close(e: CloseEvent): void;
-}
-
-interface IMessageSocket {
-    init(token: string): void;
-    sendMessage(text: string): void;
-    renderMessage(e: MessageEvent): void;
-}
 
 class Socket implements ISocket{
     socket: WebSocket | null;
@@ -73,11 +54,11 @@ class MessageSocket extends ListenerSocket implements IMessageSocket{
     }
 
     sendMessage(text: string) {
-        this.socket?.send(JSON.stringify({ text }));
+        this.socket?.send(checkJSON({ text } , false));
     }
 
     renderMessage(e: MessageEvent) {
-        const newData: MessageInfo = JSON.parse(e.data);
+        const newData: IMessageInfo = checkJSON(e.data , true);
         const message: Message = new Message(newData);
         message.prependItem(CHAT.LIST);
         scrollToBottom();

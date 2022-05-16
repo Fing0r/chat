@@ -1,15 +1,6 @@
-// @ts-ignore
 import { format, getTime } from "date-fns";
 import { AUTHOR } from "./config";
-
-export type MessageInfo = {
-  text: string;
-  user: {
-    email: string;
-    name: string;
-  };
-  createdAt: string;
-};
+import { IMessageInfo } from "./interfaces"
 
 export class Message {
   private readonly text: string;
@@ -18,7 +9,7 @@ export class Message {
   private readonly time: string | number;
   private readonly template: HTMLTemplateElement;
 
-  constructor({ text, user: { email, name }, createdAt }: MessageInfo) {
+  constructor({ text, user: { email, name }, createdAt }: IMessageInfo) {
     this.email = email;
     this.text = text;
     this.name = name;

@@ -1,4 +1,4 @@
-import { throttle, scrollToBottom, showArrowOnScroll } from "./helper";
+import { throttle, scrollToBottom, showArrowOnScroll, hideAlert } from "./utils";
 import { CHAT, FORM, BUTTONS } from "./uiElements";
 import {
     sendMessage, getCode, saveToken, changeName, loadPage, signOut, codeIsThere,
@@ -24,3 +24,5 @@ FORM.CHANGE_NAME.addEventListener("submit", changeName);
 CHAT.START.addEventListener("click", scrollToBottom);
 CHAT.LIST.addEventListener("scroll", renderMessageOnScrollThrottle);
 CHAT.LIST.addEventListener("scroll", showArrowOnScrollThrottle);
+
+document.addEventListener("input", hideAlert)

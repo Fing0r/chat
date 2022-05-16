@@ -1,68 +1,30 @@
-interface Url {
-  AUTHORIZATION: string;
-  CHANGE_NAME: string;
-  MESSAGE: string;
-  SOCKET: string;
-}
+import {IAuthor, IUrl, IMessages, IHeaders, IMethods} from "./interfaces"
 
-type MessageInfo = {
-  text: string;
-  user: {
-    email: string;
-    name: string;
-  };
-  createdAt: string;
-};
-
-interface Author {
-  NAME: string;
-  COMPANION: string;
-  EMAIL: string;
-}
-
-interface Headers {
-  JSON: string;
-  TOKEN: (token: string) => string
-}
-
-interface Methods {
-  PATCH: string;
-  POST: string;
-}
-
-interface Messages {
-  START: number;
-  END: number;
-  STORAGE: MessageInfo[];
-  USER: HTMLCollectionOf<Element>;
-}
-
-export const URL: Url = {
+export const URL: IUrl = {
   AUTHORIZATION: "https://mighty-cove-31255.herokuapp.com/api/user",
   CHANGE_NAME: "https://mighty-cove-31255.herokuapp.com/api/user/me",
   MESSAGE: "https://mighty-cove-31255.herokuapp.com/api/messages",
   SOCKET: "wss://mighty-cove-31255.herokuapp.com/websockets?",
 };
 
-export const AUTHOR: Author = {
+export const AUTHOR: IAuthor = {
   NAME: "Я",
   COMPANION: "Собеседник мой",
   EMAIL: "",
 };
 
-export const MESSAGES: Messages = {
-  START: 1,
-  END: 20,
+export const MESSAGES: IMessages = {
+  COUNT_RENDER: 21,
   STORAGE: [],
   USER: document.getElementsByClassName("message--user"),
 };
 
-export const HEADERS: Headers = {
+export const HEADERS: IHeaders = {
   JSON: "application/json;charset=utf-8",
   TOKEN: (token: string): string => `Bearer ${token}`,
 };
 
-export const METHODS: Methods = {
+export const METHODS: IMethods = {
   PATCH: "PATCH",
   POST: "POST",
 };

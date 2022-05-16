@@ -13,8 +13,7 @@ exports.AUTHOR = {
     EMAIL: "",
 };
 exports.MESSAGES = {
-    START: 1,
-    END: 20,
+    COUNT_RENDER: 21,
     STORAGE: [],
     USER: document.getElementsByClassName("message--user"),
 };

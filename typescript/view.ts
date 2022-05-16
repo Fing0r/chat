@@ -7,11 +7,11 @@ import { AUTHOR, MESSAGES } from "./config";
 import { INIT_MODAL } from "./modal";
 import {
     showMessage, hideMessage, setCookiesToken, clearForm, getValue, getToken,
-} from "./helper";
+} from "./utils";
 import { renderMessages } from "./render";
 import { loader } from "./loader";
 import { SOCKET } from "./webSocket";
-import { ResponseError } from "./CustomError";
+import { ResponseError, TokenRequiredError } from "./CustomError";
 
 export function codeIsThere() {
     INIT_MODAL.AUTHORIZATION.close();
@@ -38,8 +38,11 @@ export async function getCode(e: any): Promise<void> {
         hideMessage(e);
         clearForm(e);
     } catch (error) {
-        if (error instanceof ResponseError) console.log(error.message);
-        if (error instanceof Error) showMessage(e, error.message);
+        if (error instanceof ResponseError) {
+            showMessage(e, error.message);
+        } else if (error instanceof Error) {
+            showMessage(e, error.message);
+        }
     }
 }
 
@@ -64,7 +67,13 @@ export async function changeName(e: any): Promise<void> {
             SOCKET.reconnect(token);
         }
     } catch (error) {
-        if (error instanceof Error) showMessage(e, error.message);
+        if (error instanceof TokenRequiredError) {
+            showMessage(e, error.message);
+        } else if (error instanceof ResponseError) {
+            showMessage(e, error.message);
+        } else {
+            throw error
+        }
     }
 }
 
@@ -78,7 +87,7 @@ function stateUIElements(email?: string, name?: string): void {
 
 async function getAccountData(token: string): Promise<void> {
     const response = await requestForAccountData(token);
-    if (!response.ok) throw new Error("Ошибка запроса");
+    if (!response.ok) throw new ResponseError("Ошибка запроса");
     const { email, name } = await response.json();
     stateUIElements(email, name);
 }
@@ -121,10 +130,14 @@ export async function loadPage(): Promise<void> {
         MESSAGES.STORAGE = await importMessage();
         renderMessages(MESSAGES.STORAGE);
     } catch (error) {
-        if (error instanceof Error) {
-            console.log(error.message);
-        }
         stateUIElements();
+        if (error instanceof TokenRequiredError) {
+            console.log(error.message);
+        } else if (error instanceof ResponseError) {
+            console.log(error.message);
+        } else {
+            throw error
+        }
     } finally {
         loader(CHAT.BODY);
     }
@@ -135,11 +148,7 @@ export function signOut(): void {
     SOCKET.disconnect();
     CHAT.LIST.replaceChildren();
     stateUIElements();
-    MESSAGES.START = 1;
-    MESSAGES.END = 20;
+    MESSAGES.COUNT_RENDER = 20;
     MESSAGES.STORAGE = [];
 }
-
-
-
 // export async function getCode(e: {target: HTMLElement, preventDefault(): void}): Promise<void> {
